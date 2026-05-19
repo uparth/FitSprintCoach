@@ -1,7 +1,7 @@
 import { AppData } from "@/domain/models";
 import { appDataSchema, bodyMetricSchema, checkinSchema, exercisePlanSchema, nutritionTargetSchema, profileSchema, retrospectiveSchema, roadmapSchema, settingsSchema, sprintSchema, sprintTaskSchema, taskTemplateSchema } from "@/storage/schemas";
 import { seedTemplates } from "@/storage/seedTemplates";
-import { readJsonFile, writeJsonFile } from "@/storage/jsonStore";
+import { deleteJsonFile, readJsonFile, writeJsonFile } from "@/storage/jsonStore";
 import { z } from "zod";
 
 const files = {
@@ -53,13 +53,13 @@ export async function loadAppData(): Promise<AppData> {
 export async function saveAppData(data: AppData): Promise<void> {
   const valid = appDataSchema.parse(data);
   await Promise.all([
-    writeJsonFile(files.profile, valid.profile),
+    valid.profile ? writeJsonFile(files.profile, valid.profile) : deleteJsonFile(files.profile),
     writeJsonFile(files.bodyMetrics, valid.bodyMetrics),
     writeJsonFile(files.nutritionTargets, valid.nutritionTargets),
     writeJsonFile(files.exercisePlans, valid.exercisePlans),
     writeJsonFile(files.templates, valid.templates),
     writeJsonFile(files.backlog, valid.backlog),
-    writeJsonFile(files.roadmap, valid.roadmap),
+    valid.roadmap ? writeJsonFile(files.roadmap, valid.roadmap) : deleteJsonFile(files.roadmap),
     writeJsonFile(files.sprints, valid.sprints),
     writeJsonFile(files.tasks, valid.tasks),
     writeJsonFile(files.checkins, valid.checkins),

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ScrollView, Text } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "@/app/navigation/RootNavigator";
 import { AppButton } from "@/components/common/AppButton";
 import { AppCard } from "@/components/common/AppCard";
 import { AppTextInput } from "@/components/common/AppTextInput";
@@ -13,7 +15,9 @@ function splitList(value: string) {
   return value.split(",").map((item) => item.trim()).filter(Boolean);
 }
 
-export function RetrospectiveScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, "Retrospective">;
+
+export function RetrospectiveScreen({ navigation }: Props) {
   const state = useAppStore();
   const sprint = selectActiveSprint(state);
   const [worked, setWorked] = useState("");

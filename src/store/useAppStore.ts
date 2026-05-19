@@ -3,6 +3,7 @@ import { AppData, DailyCheckIn, Profile, Retrospective, SprintTask, TaskStatus }
 import { buildBodyAssessment } from "@/domain/bmi";
 import { generateSprint } from "@/domain/sprintPlanner";
 import { calculateBMI } from "@/domain/bmi";
+import { calculateRollingVelocity } from "@/domain/velocity";
 import { emptyAppData, loadAppData, saveAppData } from "@/storage/repositories/appRepository";
 import { createId } from "@/utils/ids";
 import { nowISO, todayISO } from "@/utils/dates";
@@ -15,6 +16,8 @@ interface AppState extends AppData {
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   addCheckIn: (checkin: Omit<DailyCheckIn, "id" | "date">) => Promise<void>;
   addRetrospective: (retro: Omit<Retrospective, "id">) => Promise<void>;
+  addTemplateToBacklog: (templateId: string) => Promise<void>;
+  addBacklogTaskToSprint: (taskId: string) => Promise<void>;
   importData: (data: AppData) => Promise<void>;
   resetData: () => Promise<void>;
 }
@@ -95,10 +98,61 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ checkins: [fullCheckin, ...get().checkins] });
     await get().persist();
   },
+  addTemplateToBacklog: async (templateId) => {
+    const template = get().templates.find((item) => item.id === templateId);
+    if (!template) return;
+    const task: SprintTask = {
+      id: createId("backlog_task"),
+      templateId: template.id,
+      sprintId: "backlog",
+      title: template.title,
+      category: template.category,
+      points: template.points,
+      targetCount: template.frequency.target,
+      completedCount: 0,
+      status: "todo",
+      definitionOfDone: template.definitionOfDone,
+      fallback: template.fallback
+    };
+    set({ backlog: [task, ...get().backlog] });
+    await get().persist();
+  },
+  addBacklogTaskToSprint: async (taskId) => {
+    const sprint = get().sprints.find((item) => item.id === get().settings.selectedSprintId);
+    const backlogTask = get().backlog.find((task) => task.id === taskId);
+    if (!sprint || !backlogTask) return;
+    const task: SprintTask = {
+      ...backlogTask,
+      id: createId("task"),
+      sprintId: sprint.id,
+      completedCount: 0,
+      status: "todo"
+    };
+    set({
+      backlog: get().backlog.filter((item) => item.id !== taskId),
+      tasks: [...get().tasks, task],
+      sprints: get().sprints.map((item) =>
+        item.id === sprint.id
+          ? { ...item, taskIds: [...item.taskIds, task.id], plannedPoints: item.plannedPoints + task.points }
+          : item
+      )
+    });
+    await get().persist();
+  },
   addRetrospective: async (retro) => {
+    const profile = get().profile;
+    const completedSprints = get().sprints.map((sprint) => sprint.id === retro.sprintId ? { ...sprint, status: "completed" as const } : sprint);
+    const velocity = calculateRollingVelocity(completedSprints);
+    const nextSprintNumber = completedSprints.length + 1;
+    const generated = profile ? generateSprint(profile, nextSprintNumber, get().templates, velocity || undefined) : undefined;
     set({
       retrospectives: [{ ...retro, id: createId("retro") }, ...get().retrospectives],
-      sprints: get().sprints.map((sprint) => sprint.id === retro.sprintId ? { ...sprint, status: "completed" } : sprint)
+      roadmap: generated?.roadmap ?? get().roadmap,
+      sprints: generated ? [...completedSprints, generated.sprint] : completedSprints,
+      tasks: generated ? [...get().tasks, ...generated.tasks] : get().tasks,
+      nutritionTargets: generated ? [...get().nutritionTargets, generated.nutritionTarget] : get().nutritionTargets,
+      exercisePlans: generated ? [...get().exercisePlans, generated.exercisePlan] : get().exercisePlans,
+      settings: generated ? { ...get().settings, selectedSprintId: generated.sprint.id } : get().settings
     });
     await get().persist();
   },

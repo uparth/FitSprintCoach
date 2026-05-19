@@ -1,4 +1,6 @@
 import { ScrollView, Text } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "@/app/navigation/RootNavigator";
 import { AppButton } from "@/components/common/AppButton";
 import { AppCard } from "@/components/common/AppCard";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -8,7 +10,9 @@ import { screenStyles } from "@/screens/styles";
 import { selectActiveSprint } from "@/store/selectors";
 import { useAppStore } from "@/store/useAppStore";
 
-export function SprintReviewScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, "SprintReview">;
+
+export function SprintReviewScreen({ navigation }: Props) {
   const state = useAppStore();
   const sprint = selectActiveSprint(state);
   if (!sprint) return <EmptyState text="No active sprint to review." />;

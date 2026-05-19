@@ -17,7 +17,7 @@ export async function readJsonFile<T>(fileName: string, schema: z.ZodType<T>, fa
   const path = getDataPath(fileName);
   const info = await FileSystem.getInfoAsync(path);
   if (!info.exists) {
-    await writeJsonFile(fileName, fallback);
+    if (fallback !== undefined) await writeJsonFile(fileName, fallback);
     return fallback;
   }
   const raw = await FileSystem.readAsStringAsync(path);
