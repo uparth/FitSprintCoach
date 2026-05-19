@@ -1,4 +1,4 @@
-import { AppProviders } from "./src/app/providers/AppProviders";
+import { AppProviders } from "./src/core/providers/AppProviders";
 
 export default function App() {
   return <AppProviders />;

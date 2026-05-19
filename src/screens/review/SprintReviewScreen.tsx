@@ -1,6 +1,6 @@
 import { ScrollView, Text } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "@/app/navigation/RootNavigator";
+import { RootStackParamList } from "@/core/navigation/RootNavigator";
 import { AppButton } from "@/components/common/AppButton";
 import { AppCard } from "@/components/common/AppCard";
 import { EmptyState } from "@/components/common/EmptyState";

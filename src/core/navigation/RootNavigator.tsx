@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { BottomTabs } from "@/app/navigation/BottomTabs";
+import { BottomTabs } from "@/core/navigation/BottomTabs";
 import { OnboardingScreen } from "@/screens/onboarding/OnboardingScreen";
 import { SprintReviewScreen } from "@/screens/review/SprintReviewScreen";
 import { RetrospectiveScreen } from "@/screens/review/RetrospectiveScreen";

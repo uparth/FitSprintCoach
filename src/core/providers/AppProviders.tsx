@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
-import { RootNavigator } from "@/app/navigation/RootNavigator";
+import { RootNavigator } from "@/core/navigation/RootNavigator";
 import { useAppStore } from "@/store/useAppStore";
 import { colors } from "@/theme/colors";
 
