@@ -5,8 +5,9 @@ import { buildMacroTarget } from "../src/domain/macroPlanner";
 import { calculateWaterTarget } from "../src/domain/waterPlanner";
 import { generateRoadmap, generateSprint } from "../src/domain/sprintPlanner";
 import { getNutritionAdherenceInsight, getSkippedTaskInsights } from "../src/domain/scrumMasterRules";
+import { buildBackupJson, parseBackupJson, validateBackupJson } from "../src/storage/exportImport";
 import { seedTemplates } from "../src/storage/seedTemplates";
-import { Profile, TaskCategory } from "../src/domain/models";
+import { AppData, Profile, TaskCategory } from "../src/domain/models";
 
 const profile: Profile = {
   id: "user_test",
@@ -65,5 +66,24 @@ assert.equal(getNutritionAdherenceInsight([
   { id: "c2", date: "2026-05-20", sprintId: "s1", yesterday: "", today: "", blockers: [], proteinActualGrams: 70, taskUpdates: [] },
   { id: "c3", date: "2026-05-21", sprintId: "s1", yesterday: "", today: "", blockers: [], proteinActualGrams: 120, taskUpdates: [] }
 ], generatedSprint.nutritionTarget), "Protein is the weakest link this week. Add one simple protein anchor meal.");
+
+const backupData: AppData = {
+  profile,
+  bodyMetrics: [],
+  nutritionTargets: [generatedSprint.nutritionTarget],
+  exercisePlans: [generatedSprint.exercisePlan],
+  templates: seedTemplates,
+  backlog: [],
+  roadmap: generatedSprint.roadmap,
+  sprints: [generatedSprint.sprint],
+  tasks: generatedSprint.tasks,
+  checkins: [],
+  retrospectives: [],
+  settings: { schemaVersion: 1, hasCompletedOnboarding: true, selectedSprintId: generatedSprint.sprint.id }
+};
+const backupJson = buildBackupJson(backupData);
+assert.equal(parseBackupJson(backupJson).profile?.id, "user_test");
+assert.equal(parseBackupJson(JSON.stringify({ ...backupData, settings: { ...backupData.settings, schemaVersion: 0 } })).settings.schemaVersion, 1);
+assert.equal(validateBackupJson("{bad json").ok, false);
 
 console.log("Domain smoke tests passed.");

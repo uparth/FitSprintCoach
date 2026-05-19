@@ -5,7 +5,8 @@ import { AppCard } from "@/components/common/AppCard";
 import { AppTextInput } from "@/components/common/AppTextInput";
 import { SegmentedControl } from "@/components/common/SegmentedControl";
 import { ActivityLevel, Pace, Sex, Units } from "@/domain/models";
-import { buildBackupJson, parseBackupJson } from "@/storage/exportImport";
+import { buildBackupJson, validateBackupJson } from "@/storage/exportImport";
+import { shareBackup } from "@/storage/shareBackup";
 import { useAppStore } from "@/store/useAppStore";
 import { screenStyles } from "@/screens/styles";
 
@@ -76,11 +77,22 @@ export function SettingsScreen() {
   }
 
   async function handleImport() {
+    const result = validateBackupJson(backup);
+    if (!result.ok) {
+      setMessage(`Import failed. ${result.error}`);
+      return;
+    }
+    await state.importData(result.data);
+    setMessage("Backup imported.");
+  }
+
+  async function handleShareBackup() {
     try {
-      await state.importData(parseBackupJson(backup));
-      setMessage("Backup imported.");
+      const sharedBackup = await shareBackup(state);
+      setBackup(sharedBackup);
+      setMessage("Backup ready to share.");
     } catch {
-      setMessage("Import failed. Check that the backup JSON is valid.");
+      setMessage("Backup sharing failed.");
     }
   }
 
@@ -159,6 +171,7 @@ export function SettingsScreen() {
       <AppCard>
         <Text style={screenStyles.sectionTitle}>Data export</Text>
         <AppButton label="Generate backup JSON" variant="secondary" onPress={() => setBackup(buildBackupJson(state))} />
+        <AppButton label="Share backup JSON" variant="secondary" onPress={handleShareBackup} />
         <AppTextInput label="Backup JSON" multiline value={backup} onChangeText={setBackup} placeholder="Backup JSON appears here or paste one to import" />
         <AppButton label="Import backup JSON" variant="secondary" onPress={handleImport} />
         {message ? <Text style={screenStyles.meta}>{message}</Text> : null}

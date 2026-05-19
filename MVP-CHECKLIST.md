@@ -8,6 +8,7 @@
 - Zod validation for persisted data
 - Seed task templates
 - Backup JSON export/import
+- Backup JSON sharing
 - Reset local data flow
 - Onboarding with disclaimer and body assessment
 - BMI, healthy weight range, goal, and milestone calculations

@@ -5,6 +5,7 @@ import { generateSprint } from "@/domain/sprintPlanner";
 import { calculateBMI } from "@/domain/bmi";
 import { calculateRollingVelocity } from "@/domain/velocity";
 import { emptyAppData, loadAppData, saveAppData } from "@/storage/repositories/appRepository";
+import { migrateAppData } from "@/storage/migrations";
 import { createId } from "@/utils/ids";
 import { addDaysISO, nowISO, todayISO } from "@/utils/dates";
 
@@ -211,7 +212,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     await get().persist();
   },
   importData: async (data) => {
-    set({ ...data, isHydrated: true });
+    set({ ...migrateAppData(data), isHydrated: true });
     await get().persist();
   },
   resetData: async () => {
