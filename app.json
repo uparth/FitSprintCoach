@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "FitSprint Coach",
+    "slug": "fitsprint-coach",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#F7F7F4"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F7F7F4"
+      }
+    }
+  }
+}
