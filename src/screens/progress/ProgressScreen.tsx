@@ -1,5 +1,6 @@
 import { ScrollView, Text } from "react-native";
 import { AppCard } from "@/components/common/AppCard";
+import { SectionHeader } from "@/components/common/SectionHeader";
 import { NutritionAdherenceChart } from "@/components/charts/NutritionAdherenceChart";
 import { VelocityChart } from "@/components/charts/VelocityChart";
 import { WeightChart } from "@/components/charts/WeightChart";
@@ -26,51 +27,51 @@ export function ProgressScreen() {
     <ScrollView style={screenStyles.screen} contentContainerStyle={screenStyles.content}>
       <Text style={screenStyles.title}>Progress</Text>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Weight trend</Text>
+        <SectionHeader title="Weight trend" meta="Recent body metric entries" />
         <WeightChart data={buildWeightTrend(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>BMI trend</Text>
+        <SectionHeader title="BMI trend" />
         <WeightChart data={buildBMITrend(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Target projection</Text>
+        <SectionHeader title="Target projection" meta="Generated roadmap targets" />
         <WeightChart data={buildTargetWeightProjection(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Sprint velocity</Text>
+        <SectionHeader title="Sprint velocity" />
         <VelocityChart data={buildVelocityTrend(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Planned points</Text>
+        <SectionHeader title="Planned points" />
         <VelocityChart data={buildPlannedPointsTrend(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Completed points</Text>
+        <SectionHeader title="Completed points" />
         <VelocityChart data={buildCompletedPointsTrend(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Walking minutes</Text>
+        <SectionHeader title="Walking minutes" />
         <VelocityChart data={buildWalkingMinutes(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Cycling minutes</Text>
+        <SectionHeader title="Cycling minutes" />
         <VelocityChart data={buildCyclingMinutes(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Calories actual</Text>
+        <SectionHeader title="Calories actual" />
         <NutritionAdherenceChart data={buildCaloriesActual(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Protein actual</Text>
+        <SectionHeader title="Protein actual" />
         <NutritionAdherenceChart data={buildProteinActual(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Fiber actual</Text>
+        <SectionHeader title="Fiber actual" />
         <NutritionAdherenceChart data={buildFiberActual(state)} />
       </AppCard>
       <AppCard>
-        <Text style={screenStyles.sectionTitle}>Water adherence</Text>
+        <SectionHeader title="Water adherence" />
         <NutritionAdherenceChart data={buildWaterAdherence(state)} />
       </AppCard>
     </ScrollView>
