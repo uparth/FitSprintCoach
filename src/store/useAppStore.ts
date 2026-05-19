@@ -134,7 +134,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateTaskStatus: async (taskId, status) => {
     const tasks = get().tasks.map((task) => {
       if (task.id !== taskId) return task;
-      const completedCount = status === "done" ? task.targetCount : task.completedCount;
+      const completedCount = getCompletedCountForStatus(task.targetCount, task.completedCount, status);
       return { ...task, status, completedCount };
     });
     const activeSprint = get().sprints.find((sprint) => sprint.id === get().settings.selectedSprintId);
@@ -220,3 +220,10 @@ export const useAppStore = create<AppState>((set, get) => ({
     await get().persist();
   }
 }));
+
+function getCompletedCountForStatus(targetCount: number, currentCount: number, status: TaskStatus) {
+  if (status === "done") return targetCount;
+  if (status === "partial" || status === "adjusted") return Math.max(currentCount, Math.ceil(targetCount / 2));
+  if (status === "skipped" || status === "blocked") return currentCount;
+  return currentCount;
+}

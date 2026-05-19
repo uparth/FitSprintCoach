@@ -18,6 +18,7 @@ export function TodayScreen() {
   const tasks = selectTasksForSprint(state, sprint?.id);
   const nutrition = selectTodayNutrition(state);
   const note = getDailyCoachNote(todayISO(), sprint, state.checkins, nutrition);
+  const latestCheckin = state.checkins.find((checkin) => checkin.sprintId === sprint?.id);
 
   if (!sprint) return <EmptyState text="No active sprint yet." />;
 
@@ -29,6 +30,15 @@ export function TodayScreen() {
         <Text style={screenStyles.sectionTitle}>Daily standup</Text>
         <StandupForm sprintId={sprint.id} onSubmit={state.addCheckIn} />
       </AppCard>
+      {latestCheckin ? (
+        <AppCard>
+          <Text style={screenStyles.sectionTitle}>Latest check-in</Text>
+          <Text style={screenStyles.meta}>{latestCheckin.date}</Text>
+          <Text style={screenStyles.body}>Today: {latestCheckin.today || "No note"}</Text>
+          {latestCheckin.blockers.length > 0 ? <Text style={screenStyles.meta}>Blockers: {latestCheckin.blockers.join(", ")}</Text> : null}
+          {latestCheckin.waterActualMl ? <Text style={screenStyles.meta}>Water: {latestCheckin.waterActualMl} ml</Text> : null}
+        </AppCard>
+      ) : null}
       {nutrition ? (
         <AppCard>
           <Text style={screenStyles.sectionTitle}>Nutrition targets</Text>
