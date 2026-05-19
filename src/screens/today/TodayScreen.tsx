@@ -17,7 +17,7 @@ export function TodayScreen() {
   const sprint = selectActiveSprint(state);
   const tasks = selectTasksForSprint(state, sprint?.id);
   const nutrition = selectTodayNutrition(state);
-  const note = getDailyCoachNote(todayISO(), sprint, state.checkins);
+  const note = getDailyCoachNote(todayISO(), sprint, state.checkins, nutrition);
 
   if (!sprint) return <EmptyState text="No active sprint yet." />;
 

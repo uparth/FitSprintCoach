@@ -31,9 +31,7 @@
 
 - Run the Expo app under Node 18+ and verify on simulator/device
 - Add real line charts when runtime verification is available
-- Add reminder scheduling
-- Expand template packs
-- Add richer profile controls for units, activity level, pace, and sprint length after onboarding
+- Add real reminder scheduling
 - Add stronger import migration test coverage
 - Add visual QA on small and large mobile screens
 

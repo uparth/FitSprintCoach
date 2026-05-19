@@ -48,7 +48,15 @@ export async function loadAppData(): Promise<AppData> {
     retrospectives: await readJsonFile(files.retrospectives, z.array(retrospectiveSchema), []),
     settings: await readJsonFile(files.settings, settingsSchema, emptyAppData.settings)
   };
-  return migrateAppData(appDataSchema.parse(data));
+  const migrated = migrateAppData(appDataSchema.parse(data));
+  const existingTemplateIds = new Set(migrated.templates.map((template) => template.id));
+  return {
+    ...migrated,
+    templates: [
+      ...migrated.templates,
+      ...seedTemplates.filter((template) => !existingTemplateIds.has(template.id))
+    ]
+  };
 }
 
 export async function saveAppData(data: AppData): Promise<void> {

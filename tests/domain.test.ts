@@ -4,8 +4,9 @@ import { applyCalorieSafetyBounds, estimateWeeklyWeightLoss } from "../src/domai
 import { buildMacroTarget } from "../src/domain/macroPlanner";
 import { calculateWaterTarget } from "../src/domain/waterPlanner";
 import { generateRoadmap, generateSprint } from "../src/domain/sprintPlanner";
+import { getNutritionAdherenceInsight, getSkippedTaskInsights } from "../src/domain/scrumMasterRules";
 import { seedTemplates } from "../src/storage/seedTemplates";
-import { Profile } from "../src/domain/models";
+import { Profile, TaskCategory } from "../src/domain/models";
 
 const profile: Profile = {
   id: "user_test",
@@ -48,5 +49,21 @@ const generatedSprint = generateSprint(profile, 2, seedTemplates, 12, "2026-05-2
 assert.equal(generatedSprint.sprint.startDate, "2026-05-26");
 assert.equal(generatedSprint.sprint.endDate, "2026-06-01");
 assert.ok(generatedSprint.tasks.some((task) => task.estimatedMinutes));
+
+const templateCategories = new Set(seedTemplates.map((template) => template.category));
+["walking", "cycling", "home_food", "calories", "protein", "fiber", "water", "sleep", "mindset", "recovery"].forEach((category) => {
+  assert.ok(templateCategories.has(category as TaskCategory));
+});
+
+assert.deepEqual(getSkippedTaskInsights([
+  { id: "c1", date: "2026-05-19", sprintId: "s1", yesterday: "", today: "", blockers: [], taskUpdates: [{ taskId: "t1", status: "skipped" }] },
+  { id: "c2", date: "2026-05-20", sprintId: "s1", yesterday: "", today: "", blockers: [], taskUpdates: [{ taskId: "t1", status: "blocked" }] }
+]), ["t1"]);
+
+assert.equal(getNutritionAdherenceInsight([
+  { id: "c1", date: "2026-05-19", sprintId: "s1", yesterday: "", today: "", blockers: [], proteinActualGrams: 60, taskUpdates: [] },
+  { id: "c2", date: "2026-05-20", sprintId: "s1", yesterday: "", today: "", blockers: [], proteinActualGrams: 70, taskUpdates: [] },
+  { id: "c3", date: "2026-05-21", sprintId: "s1", yesterday: "", today: "", blockers: [], proteinActualGrams: 120, taskUpdates: [] }
+], generatedSprint.nutritionTarget), "Protein is the weakest link this week. Add one simple protein anchor meal.");
 
 console.log("Domain smoke tests passed.");
