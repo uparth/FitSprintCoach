@@ -92,6 +92,7 @@ export function OnboardingScreen() {
       <View style={styles.grid}>
         <BodyMetricCard label="BMI" value={`${assessment.bmi}`} note={assessment.category} />
         <BodyMetricCard label="Healthy range" value={`${assessment.healthyRange.minKg}-${assessment.healthyRange.maxKg} kg`} />
+        <BodyMetricCard label="Weight to reduce" value={`${assessment.weightToReduceKg} kg`} />
         <BodyMetricCard label="Daily calories" value={`${calories.calories}`} note={calories.warnings[0]} />
         <BodyMetricCard label="Macros" value={`${macros.proteinGrams}P ${macros.carbsGrams}C ${macros.fatGrams}F`} note={`${macros.fiberGrams}g fiber`} />
         <BodyMetricCard label="Water" value={`${calculateWaterTarget(profileDraft.currentWeightKg)} ml`} />

@@ -4,7 +4,7 @@ import { AppCard } from "@/components/common/AppCard";
 import { colors } from "@/theme/colors";
 import { spacing } from "@/theme/spacing";
 
-const statuses: TaskStatus[] = ["done", "partial", "blocked", "skipped"];
+const statuses: TaskStatus[] = ["done", "partial", "adjusted", "blocked", "skipped"];
 
 export function TaskCard({ task, onStatus }: { task: SprintTask; onStatus: (status: TaskStatus) => void }) {
   return (

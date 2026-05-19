@@ -50,6 +50,12 @@ const generatedSprint = generateSprint(profile, 2, seedTemplates, 12, "2026-05-2
 assert.equal(generatedSprint.sprint.startDate, "2026-05-26");
 assert.equal(generatedSprint.sprint.endDate, "2026-06-01");
 assert.ok(generatedSprint.tasks.some((task) => task.estimatedMinutes));
+assert.ok(generatedSprint.tasks.some((task) => task.category === "cycling"));
+
+const noBikeSprint = generateSprint({ ...profile, hasIndoorBike: false, cyclingDays: 0 }, 1, seedTemplates);
+assert.equal(noBikeSprint.tasks.some((task) => task.category === "cycling"), false);
+assert.ok(noBikeSprint.tasks.some((task) => task.category === "water"));
+assert.ok(noBikeSprint.tasks.some((task) => task.category === "protein"));
 
 const templateCategories = new Set(seedTemplates.map((template) => template.category));
 ["walking", "cycling", "home_food", "calories", "protein", "fiber", "water", "sleep", "mindset", "recovery"].forEach((category) => {

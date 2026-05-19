@@ -80,8 +80,8 @@ export function buildExercisePlan(profile: Profile, sprintId: string, sprintNumb
   };
 }
 
-export function generateSprintTasks(sprint: Sprint, templates: TaskTemplate[]): SprintTask[] {
-  const wanted = ["walking", "cycling", "water", "protein", "home_food"];
+export function generateSprintTasks(sprint: Sprint, templates: TaskTemplate[], includeCycling = true): SprintTask[] {
+  const wanted = includeCycling ? ["walking", "cycling", "water", "protein", "home_food"] : ["walking", "water", "protein", "home_food", "fiber"];
   return templates
     .filter((template) => wanted.includes(template.category))
     .slice(0, 5)
@@ -125,7 +125,7 @@ export function generateSprint(profile: Profile, sprintNumber: number, templates
     taskIds: [],
     status: sprintNumber === 1 ? "active" : "planned"
   };
-  const tasks = generateSprintTasks(sprint, templates);
+  const tasks = generateSprintTasks(sprint, templates, profile.hasIndoorBike && profile.cyclingDays > 0);
   sprint.taskIds = tasks.map((task) => task.id);
   return { roadmap, sprint, tasks, nutritionTarget, exercisePlan };
 }
