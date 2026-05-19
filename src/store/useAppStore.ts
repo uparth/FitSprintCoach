@@ -6,7 +6,7 @@ import { calculateBMI } from "@/domain/bmi";
 import { calculateRollingVelocity } from "@/domain/velocity";
 import { emptyAppData, loadAppData, saveAppData } from "@/storage/repositories/appRepository";
 import { createId } from "@/utils/ids";
-import { nowISO, todayISO } from "@/utils/dates";
+import { addDaysISO, nowISO, todayISO } from "@/utils/dates";
 
 interface AppState extends AppData {
   isHydrated: boolean;
@@ -108,6 +108,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       title: template.title,
       category: template.category,
       points: template.points,
+      estimatedMinutes: template.estimatedMinutes,
       targetCount: template.frequency.target,
       completedCount: 0,
       status: "todo",
@@ -141,10 +142,12 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
   addRetrospective: async (retro) => {
     const profile = get().profile;
+    const closedSprint = get().sprints.find((sprint) => sprint.id === retro.sprintId);
     const completedSprints = get().sprints.map((sprint) => sprint.id === retro.sprintId ? { ...sprint, status: "completed" as const } : sprint);
     const velocity = calculateRollingVelocity(completedSprints);
     const nextSprintNumber = completedSprints.length + 1;
-    const generated = profile ? generateSprint(profile, nextSprintNumber, get().templates, velocity || undefined) : undefined;
+    const nextStartDate = closedSprint ? addDaysISO(closedSprint.endDate, 1) : undefined;
+    const generated = profile ? generateSprint(profile, nextSprintNumber, get().templates, velocity || undefined, nextStartDate) : undefined;
     set({
       retrospectives: [{ ...retro, id: createId("retro") }, ...get().retrospectives],
       roadmap: generated?.roadmap ?? get().roadmap,

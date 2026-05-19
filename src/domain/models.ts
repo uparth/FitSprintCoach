@@ -103,6 +103,7 @@ export interface SprintTask {
   title: string;
   category: TaskCategory;
   points: number;
+  estimatedMinutes?: number;
   targetCount: number;
   completedCount: number;
   status: TaskStatus;

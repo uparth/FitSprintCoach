@@ -1,4 +1,5 @@
 import { AppData } from "@/domain/models";
+import { migrateAppData } from "@/storage/migrations";
 import { appDataSchema, bodyMetricSchema, checkinSchema, exercisePlanSchema, nutritionTargetSchema, profileSchema, retrospectiveSchema, roadmapSchema, settingsSchema, sprintSchema, sprintTaskSchema, taskTemplateSchema } from "@/storage/schemas";
 import { seedTemplates } from "@/storage/seedTemplates";
 import { deleteJsonFile, readJsonFile, writeJsonFile } from "@/storage/jsonStore";
@@ -47,7 +48,7 @@ export async function loadAppData(): Promise<AppData> {
     retrospectives: await readJsonFile(files.retrospectives, z.array(retrospectiveSchema), []),
     settings: await readJsonFile(files.settings, settingsSchema, emptyAppData.settings)
   };
-  return appDataSchema.parse(data);
+  return migrateAppData(appDataSchema.parse(data));
 }
 
 export async function saveAppData(data: AppData): Promise<void> {

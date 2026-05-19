@@ -92,6 +92,7 @@ export function generateSprintTasks(sprint: Sprint, templates: TaskTemplate[]): 
       title: template.title,
       category: template.category,
       points: template.points,
+      estimatedMinutes: template.estimatedMinutes,
       targetCount: template.frequency.target,
       completedCount: 0,
       status: "todo",
@@ -100,10 +101,10 @@ export function generateSprintTasks(sprint: Sprint, templates: TaskTemplate[]): 
     }));
 }
 
-export function generateSprint(profile: Profile, sprintNumber: number, templates: TaskTemplate[], previousVelocity?: number) {
+export function generateSprint(profile: Profile, sprintNumber: number, templates: TaskTemplate[], previousVelocity?: number, startDateOverride?: string) {
   const roadmap = generateRoadmap(profile);
   const roadmapSprint = roadmap.sprints[Math.min(sprintNumber - 1, roadmap.sprints.length - 1)];
-  const startDate = todayISO();
+  const startDate = startDateOverride ?? todayISO();
   const sprintId = `sprint_${String(sprintNumber).padStart(3, "0")}`;
   const nutritionTarget = buildNutritionTarget(profile, sprintNumber, startDate);
   const exercisePlan = buildExercisePlan(profile, sprintId, sprintNumber);

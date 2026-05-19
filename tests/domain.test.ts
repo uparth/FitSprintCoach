@@ -3,7 +3,8 @@ import { buildBodyAssessment, calculateBMI, getHealthyWeightRange } from "../src
 import { applyCalorieSafetyBounds, estimateWeeklyWeightLoss } from "../src/domain/caloriePlanner";
 import { buildMacroTarget } from "../src/domain/macroPlanner";
 import { calculateWaterTarget } from "../src/domain/waterPlanner";
-import { generateRoadmap } from "../src/domain/sprintPlanner";
+import { generateRoadmap, generateSprint } from "../src/domain/sprintPlanner";
+import { seedTemplates } from "../src/storage/seedTemplates";
 import { Profile } from "../src/domain/models";
 
 const profile: Profile = {
@@ -42,5 +43,10 @@ const roadmap = generateRoadmap(profile);
 assert.ok(roadmap.estimatedSprints > 1);
 assert.equal(roadmap.sprints[0].phase, "foundation");
 assert.equal(estimateWeeklyWeightLoss(450), 0.41);
+
+const generatedSprint = generateSprint(profile, 2, seedTemplates, 12, "2026-05-26");
+assert.equal(generatedSprint.sprint.startDate, "2026-05-26");
+assert.equal(generatedSprint.sprint.endDate, "2026-06-01");
+assert.ok(generatedSprint.tasks.some((task) => task.estimatedMinutes));
 
 console.log("Domain smoke tests passed.");

@@ -27,6 +27,7 @@ export const sprintTaskSchema = z.object({
   title: z.string(),
   category: taskTemplateSchema.shape.category,
   points: z.number(),
+  estimatedMinutes: z.number().optional(),
   targetCount: z.number(),
   completedCount: z.number(),
   status: z.enum(["todo", "in_progress", "done", "partial", "skipped", "blocked", "adjusted"]),

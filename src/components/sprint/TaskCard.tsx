@@ -13,7 +13,9 @@ export function TaskCard({ task, onStatus }: { task: SprintTask; onStatus: (stat
         <Text style={styles.title}>{task.title}</Text>
         <Text style={styles.points}>{task.points} pts</Text>
       </View>
-      <Text style={styles.meta}>{task.completedCount}/{task.targetCount} complete</Text>
+      <Text style={styles.meta}>
+        {task.completedCount}/{task.targetCount} complete{task.estimatedMinutes ? ` · ${task.estimatedMinutes} min` : ""}
+      </Text>
       <Text style={styles.done}>{task.definitionOfDone}</Text>
       <Text style={styles.fallback}>Fallback: {task.fallback}</Text>
       <View style={styles.actions}>
