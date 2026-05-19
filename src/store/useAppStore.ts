@@ -13,6 +13,8 @@ interface AppState extends AppData {
   hydrate: () => Promise<void>;
   persist: () => Promise<void>;
   completeOnboarding: (profile: Profile) => Promise<void>;
+  updateProfile: (profile: Profile) => Promise<void>;
+  addWeightEntry: (weightKg: number, note?: string) => Promise<void>;
   updateTaskStatus: (taskId: string, status: TaskStatus) => Promise<void>;
   addCheckIn: (checkin: Omit<DailyCheckIn, "id" | "date">) => Promise<void>;
   addRetrospective: (retro: Omit<Retrospective, "id">) => Promise<void>;
@@ -37,6 +39,12 @@ function snapshot(state: AppState): AppData {
     retrospectives: state.retrospectives,
     settings: state.settings
   };
+}
+
+function replaceOrAppendById<T extends { id: string }>(items: T[], nextItem: T, id?: string) {
+  const index = items.findIndex((item) => item.id === id || item.id === nextItem.id);
+  if (index === -1) return [...items, nextItem];
+  return items.map((item, itemIndex) => itemIndex === index ? nextItem : item);
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -77,6 +85,49 @@ export const useAppStore = create<AppState>((set, get) => ({
       settings: { schemaVersion: 1, hasCompletedOnboarding: true, selectedSprintId: generated.sprint.id }
     };
     set(next);
+    await get().persist();
+  },
+  updateProfile: async (profileInput) => {
+    const assessment = buildBodyAssessment(profileInput.currentWeightKg, profileInput.heightCm, profileInput.goalWeightKg);
+    const profile: Profile = {
+      ...profileInput,
+      goalWeightKg: assessment.goalWeightKg,
+      updatedAt: nowISO()
+    };
+    const activeSprint = get().sprints.find((sprint) => sprint.id === get().settings.selectedSprintId);
+    const nextSprintNumber = activeSprint?.weekNumber ?? 1;
+    const generated = generateSprint(profile, nextSprintNumber, get().templates, undefined, activeSprint?.startDate);
+    set({
+      profile,
+      roadmap: generated.roadmap,
+      nutritionTargets: replaceOrAppendById(get().nutritionTargets, generated.nutritionTarget, activeSprint?.nutritionTargetId),
+      exercisePlans: replaceOrAppendById(get().exercisePlans, generated.exercisePlan, activeSprint?.exercisePlanId)
+    });
+    await get().persist();
+  },
+  addWeightEntry: async (weightKg, note) => {
+    const profile = get().profile;
+    if (!profile) return;
+    const date = todayISO();
+    const updatedProfile: Profile = {
+      ...profile,
+      currentWeightKg: weightKg,
+      updatedAt: nowISO()
+    };
+    const entry = {
+      id: `metric_${date}_${Date.now()}`,
+      date,
+      weightKg,
+      bmi: calculateBMI(weightKg, profile.heightCm),
+      waistCm: null,
+      note
+    };
+    const generatedRoadmap = generateSprint(updatedProfile, 1, get().templates).roadmap;
+    set({
+      profile: updatedProfile,
+      roadmap: generatedRoadmap,
+      bodyMetrics: [entry, ...get().bodyMetrics]
+    });
     await get().persist();
   },
   updateTaskStatus: async (taskId, status) => {

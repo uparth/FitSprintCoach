@@ -5,12 +5,16 @@ export interface ChartPoint {
   y: number;
 }
 
+function byXAsc(a: ChartPoint, b: ChartPoint) {
+  return String(a.x).localeCompare(String(b.x));
+}
+
 export function buildWeightTrend(data: Pick<AppData, "bodyMetrics">): ChartPoint[] {
-  return data.bodyMetrics.map((metric) => ({ x: metric.date, y: metric.weightKg }));
+  return data.bodyMetrics.map((metric) => ({ x: metric.date, y: metric.weightKg })).sort(byXAsc);
 }
 
 export function buildBMITrend(data: Pick<AppData, "bodyMetrics">): ChartPoint[] {
-  return data.bodyMetrics.map((metric) => ({ x: metric.date, y: metric.bmi }));
+  return data.bodyMetrics.map((metric) => ({ x: metric.date, y: metric.bmi })).sort(byXAsc);
 }
 
 export function buildVelocityTrend(data: Pick<AppData, "sprints">): ChartPoint[] {
@@ -51,17 +55,17 @@ export function buildCyclingMinutes(data: Pick<AppData, "sprints" | "tasks">): C
 }
 
 export function buildCaloriesActual(data: Pick<AppData, "checkins">): ChartPoint[] {
-  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.caloriesActual ?? 0 }));
+  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.caloriesActual ?? 0 })).sort(byXAsc);
 }
 
 export function buildProteinActual(data: Pick<AppData, "checkins">): ChartPoint[] {
-  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.proteinActualGrams ?? 0 }));
+  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.proteinActualGrams ?? 0 })).sort(byXAsc);
 }
 
 export function buildFiberActual(data: Pick<AppData, "checkins">): ChartPoint[] {
-  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.fiberActualGrams ?? 0 }));
+  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.fiberActualGrams ?? 0 })).sort(byXAsc);
 }
 
 export function buildWaterAdherence(data: Pick<AppData, "checkins">): ChartPoint[] {
-  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.waterActualMl ?? 0 }));
+  return data.checkins.map((checkin) => ({ x: checkin.date, y: checkin.waterActualMl ?? 0 })).sort(byXAsc);
 }

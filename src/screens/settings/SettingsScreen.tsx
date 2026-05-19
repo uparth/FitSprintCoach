@@ -12,6 +12,30 @@ export function SettingsScreen() {
   const [backup, setBackup] = useState("");
   const [message, setMessage] = useState("");
   const profile = state.profile;
+  const [name, setName] = useState(profile?.name ?? "");
+  const [age, setAge] = useState(profile?.age ? String(profile.age) : "");
+  const [heightCm, setHeightCm] = useState(profile?.heightCm ? String(profile.heightCm) : "");
+  const [goalWeightKg, setGoalWeightKg] = useState(profile?.goalWeightKg ? String(profile.goalWeightKg) : "");
+  const [weightKg, setWeightKg] = useState(profile?.currentWeightKg ? String(profile.currentWeightKg) : "");
+  const [weightNote, setWeightNote] = useState("");
+
+  async function handleProfileSave() {
+    if (!profile) return;
+    await state.updateProfile({
+      ...profile,
+      name: name.trim() || profile.name,
+      age: Number(age) || profile.age,
+      heightCm: Number(heightCm) || profile.heightCm,
+      goalWeightKg: Number(goalWeightKg) || profile.goalWeightKg
+    });
+    setMessage("Profile updated and current targets recalculated.");
+  }
+
+  async function handleWeightLog() {
+    if (!weightKg) return;
+    await state.addWeightEntry(Number(weightKg), weightNote || undefined);
+    setMessage("Weight entry saved.");
+  }
 
   async function handleImport() {
     try {
@@ -37,6 +61,24 @@ export function SettingsScreen() {
         <Text style={screenStyles.body}>{profile?.name ?? "No profile"}</Text>
         <Text style={screenStyles.meta}>{profile ? `${profile.currentWeightKg} kg · goal ${profile.goalWeightKg} kg · ${profile.preferredPace}` : "Complete onboarding first."}</Text>
       </AppCard>
+      {profile ? (
+        <AppCard>
+          <Text style={screenStyles.sectionTitle}>Edit profile</Text>
+          <AppTextInput label="Name" value={name} onChangeText={setName} />
+          <AppTextInput label="Age" keyboardType="numeric" value={age} onChangeText={setAge} />
+          <AppTextInput label="Height cm" keyboardType="numeric" value={heightCm} onChangeText={setHeightCm} />
+          <AppTextInput label="Goal weight kg" keyboardType="numeric" value={goalWeightKg} onChangeText={setGoalWeightKg} />
+          <AppButton label="Save profile" variant="secondary" onPress={handleProfileSave} />
+        </AppCard>
+      ) : null}
+      {profile ? (
+        <AppCard>
+          <Text style={screenStyles.sectionTitle}>Log weight</Text>
+          <AppTextInput label="Current weight kg" keyboardType="numeric" value={weightKg} onChangeText={setWeightKg} />
+          <AppTextInput label="Note" value={weightNote} onChangeText={setWeightNote} placeholder="Optional" />
+          <AppButton label="Save weight" variant="secondary" onPress={handleWeightLog} />
+        </AppCard>
+      ) : null}
       <AppCard>
         <Text style={screenStyles.sectionTitle}>Data export</Text>
         <AppButton label="Generate backup JSON" variant="secondary" onPress={() => setBackup(buildBackupJson(state))} />
